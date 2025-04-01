@@ -34,7 +34,7 @@ public protocol Style {
     var activitySize: CGSize { get }
     var position:MBToastPosition { get }
     var icon: NSImage? { get }
-    var iconTint: NSColor { get }
+    var iconTint: NSColor? { get }
 }
 
 extension Style {
@@ -56,7 +56,7 @@ extension Style {
     public var fadeInOutDelay: CGFloat { return 1.0 }
     public var position: MBToastPosition { return .topRight() }
     public var icon: NSImage? { return nil }
-    public var iconTint:NSColor { return foregroundColor }
+    public var iconTint:NSColor? { return nil }
 
 }
 
@@ -190,11 +190,13 @@ class ToastView: NSView {
             let img = CALayer()
             img.frame = imageRect
             img.position =  img.frame.positionImage(of: container, with: style.horizontalMargin)
-            let originalImage = style.icon! // Replace with your NSImage instance
+            var image = style.icon! // Replace with your NSImage instance
+            
+            if let tintColor = style.iconTint {
+                image = image.tinting(with: tintColor)
+            }
 
-            let tintedResizedImage = originalImage.tinting(with: style.iconTint)
-
-            img.contents = tintedResizedImage
+            img.contents = image
             img.contentsGravity = .resizeAspectFill
             container.addSublayer(img)
         }
